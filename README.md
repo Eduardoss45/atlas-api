@@ -49,7 +49,7 @@ Para usar as APIs, você precisará de uma chave de acesso para cada uma das API
 1. Clone este repositório:
 
    ```bash
-   git clone https://github.com/Eduardoss45/atlas-api-.git
+   git clone https://github.com/Eduardoss45/atlas-api.git
    ```
 
 2. Navegue até o diretório do projeto:

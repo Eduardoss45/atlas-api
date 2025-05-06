@@ -1,6 +1,8 @@
-const paises = require('./paises.json')
-const tzApiKey = 'MRR9VX9H73FM' // * TimeZoneDB
-const ipApiKey = '79dcb1295137f8' // * IpInfo
+const dotenv = require('dotenv')
+dotenv.config()
+const paises = require('./json/translate.json')
+const TZAPIKEY = process.env.TZ_API_KEY // * TimeZoneDB
+const IPAPIKEY = process.env.IP_API_KEY // * IpInfo
 
 // * Função para formatar a data com o fuso horário
 function formatarDataComFusoHorario(timeZone) {
@@ -33,7 +35,7 @@ function verificarDadosPais(countryInfo) {
 
 // * Função para obter o fuso horário local
 async function timeZoneLocal() {
-    const url = `https://ipinfo.io/json?token=${ipApiKey}`
+    const url = `https://ipinfo.io/json?token=${IPAPIKEY}`
     try {
         const response = await fetch(url)
         if (!response.ok) throw new Error(`Código: ${response.status}`)
@@ -47,7 +49,7 @@ async function timeZoneLocal() {
 
 // * Função para obter o fuso horário do país solicitado via TimeZoneDB
 async function timeZoneSolicitado(countryCode) {
-    const url = `http://api.timezonedb.com/v2.1/list-time-zone?key=${tzApiKey}&format=json&country=${countryCode}`
+    const url = `http://api.timezonedb.com/v2.1/list-time-zone?key=${TZAPIKEY}&format=json&country=${countryCode}`
     try {
         const response = await fetch(url)
         if (!response.ok) throw new Error(`Código: ${response.status}`)

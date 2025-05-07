@@ -94,13 +94,33 @@ async function getCapitalWeather(lat, lng) {
     }
 }
 
+// * Função para obter dados economicos e populacionais do país
+async function getWorldBankIndicator(countryCode, indicatorCode) {
+    const url = `https://api.worldbank.org/v2/country/${countryCode}/indicator/${indicatorCode}?format=json&per_page=100`
+    try {
+        const response = await fetch(url)
+        if (!response.ok) throw new Error(`Código: ${response.status}`)
+        const data = await response.json()
+        const availableData = data[1]?.filter(item => item.value !== null)
+        if (availableData.length === 0) {
+            console.log('Nenhum dado disponível para os anos solicitados.')
+            return null
+        }
+        const { value, date } = availableData[0]
+        return { valor: value, ano: date }
+    } catch (error) {
+        console.error(`ERRO indicador ${indicatorCode}: ${error.message}`)
+        return null
+    }
+}
+
 // * Função para traduzir o nome do país de PT para EN usando a API do IBGE
 function traduzirNomePaisParaIngles(nomePt) {
     return paises[nomePt] || null
 }
 
-// * Função principal para exibir horários
-async function exibirHorarios(nomePaisPt) {
+// * Função principal para exibir informações
+async function showInfo(nomePaisPt) {
     const nomePaisEn = traduzirNomePaisParaIngles(nomePaisPt)
     if (!nomePaisEn) {
         console.log('Não foi possível traduzir o nome do país.')
@@ -125,6 +145,13 @@ async function exibirHorarios(nomePaisPt) {
     const horarioLocal = formatarDataComFusoHorario(localTimeZone)
     const horarioSolicitado = formatarDataComFusoHorario(solicitadoTimeZone)
 
+    const [pib, populacao, expectativaVida, co2] = await Promise.all([
+        getWorldBankIndicator(countryInfo.cc, 'NY.GDP.PCAP.CD'),
+        getWorldBankIndicator(countryInfo.cc, 'SP.POP.TOTL'),
+        getWorldBankIndicator(countryInfo.cc, 'SP.DYN.LE00.IN'),
+        getWorldBankIndicator(countryInfo.cc, 'EN.ATM.CO2E.PC'),
+    ])
+
     console.log('Horário Local:', horarioLocal)
     console.log(`Horário em ${nomePaisPt}:`, horarioSolicitado)
     if (climaCapital?.daily) {
@@ -137,6 +164,12 @@ async function exibirHorarios(nomePaisPt) {
             console.log(`${dia}: Máx ${max[i]}°C / Mín ${min[i]}°C`)
         })
     }
+    console.log('\n📊 Indicadores Socioeconômicos (últimos dados disponíveis):')
+    if (pib) console.log(`PIB per capita: US$ ${pib.valor?.toLocaleString()} (${pib.ano})`)
+    if (populacao) console.log(`População total: ${populacao.valor?.toLocaleString()} (${populacao.ano})`)
+    if (expectativaVida) console.log(`Expectativa de vida: ${expectativaVida.valor?.toFixed(1)} anos (${expectativaVida.ano})`)
+    if (co2) console.log(`Emissões de CO₂ per capita: ${co2.valor?.toFixed(2)} t (${co2.ano})`)
+
 
     setInterval(() => {
         const novoHorarioLocal = formatarDataComFusoHorario(localTimeZone)
@@ -155,7 +188,32 @@ async function exibirHorarios(nomePaisPt) {
                 console.log(`${dia}: Máx ${max[i]}°C / Mín ${min[i]}°C`)
             })
         }
+        console.log('\n📊 Indicadores Socioeconômicos (últimos dados disponíveis):')
+        if (pib && pib.valor != null) {
+            console.log(`PIB per capita: US$ ${pib.valor?.toLocaleString()} (${pib.ano})`)
+        } else {
+            console.log("PIB per capita: Dados não disponíveis.")
+        }
+
+        if (populacao && populacao.valor != null) {
+            console.log(`População total: ${populacao.valor.toLocaleString()} (${populacao.ano})`)
+        } else {
+            console.log("População: Dados não disponíveis.")
+        }
+
+        if (expectativaVida && expectativaVida.valor != null) {
+            console.log(`Expectativa de vida: ${expectativaVida.valor.toFixed(1)} anos (${expectativaVida.ano})`)
+        } else {
+            console.log("Expectativa de vida: Dados não disponíveis.")
+        }
+
+        if (co2 && co2.valor != null) {
+            console.log(`Emissões de CO₂ per capita: ${co2.valor.toFixed(2)} t (${co2.ano})`)
+        } else {
+            console.log("Emissões de CO₂: Dados não disponíveis.")
+        }
+
     }, 60000)
 }
 
-exibirHorarios('Brasil')
+showInfo('Japão')

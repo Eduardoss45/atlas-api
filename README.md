@@ -1,48 +1,92 @@
-# Projeto: Exibição de Horários e Clima de Países no Terminal
+# Projeto: API de busca de dados sobre países
 
-Este projeto tem como objetivo principal exibir o horário local de um país específico, juntamente com o clima da capital desse país. O código utiliza diversas APIs para obter as informações necessárias, como a TimeZoneDB para fusos horários, IpInfo para determinar o fuso horário local, Open-Meteo para o clima e RestCountries para obter as informações do país.
+**Consulta de clima, horário, resumo, imagens e indicadores econômicos com base no nome de um país**
+
+Esta aplicação tem como objetivo exibir o horário local de um país específico, juntamente com o clima da capital, um resumo descritivo, imagens e alguns indicadores econômicos. Para isso, utiliza múltiplas APIs:
+
+- [TimeZoneDB](https://timezonedb.com/) – Fuso horário do país solicitado
+- [IpInfo](https://ipinfo.io/) – Determinação do fuso horário local
+- [Open-Meteo](https://open-meteo.com/) – Previsão do clima
+- [REST Countries](https://restcountries.com/) – Dados sobre países e suas capitais
+- [World Bank Open Data](https://data.worldbank.org/) – Indicadores econômicos e demográficos
+- [Pexels](https://pexels.com/) – Imagens dos países
+- [Wikipédia](https://pt.wikipedia.org/) – Resumo descritivo dos países
+
+---
 
 ## Funcionalidades
 
 ### 1. **Exibição do Horário Local e do País**
 
-O sistema consegue obter o fuso horário local e de um país específico e exibe o horário formatado de ambos. O horário local é baseado no IP do usuário, enquanto o horário do país é baseado no código de país obtido através de uma consulta à API do TimeZoneDB.
+Obtém o fuso horário local (com base no IP do usuário) e o fuso horário do país solicitado (via TimeZoneDB), exibindo ambos de forma formatada.
 
 ### 2. **Previsão do Clima da Capital**
 
-O sistema também exibe a previsão do clima da capital do país. A previsão inclui a temperatura máxima e mínima para os próximos dias.
+A partir das coordenadas da capital, exibe a previsão do tempo para os próximos dias, incluindo temperaturas máximas e mínimas.
 
-### 3. **Intervalo de Atualização**
+### 3. **Indicadores Econômicos e Demográficos**
 
-O horário local e o horário do país são atualizados a cada minuto, mantendo as informações sempre atuais na tela.
+Exibe dados fornecidos pelo Banco Mundial, como PIB, população e expectativa de vida.
+
+### 4. **Resumo do País**
+
+Exibe um resumo descritivo extraído da Wikipédia.
+
+### 5. **Imagens do País**
+
+Fornece URLs de imagens em diferentes tamanhos obtidas por meio da API da Pexels.
+
+---
+
+## Tecnologias Utilizadas
+
+- **Node.js**
+- **Express**
+- **node-fetch**
+- **dotenv**
+- **APIs REST externas**: TimeZoneDB, IpInfo, REST Countries, Open-Meteo, World Bank, Wikipédia, Pexels
+
+---
 
 ## Como Funciona
 
-1. **Obtenção de Fusos Horários:**
+1. **Fusos Horários**
 
-   - **Local:** O fuso horário local é determinado utilizando a API do IpInfo, que fornece a zona de tempo baseada no endereço IP do usuário.
-   - **Solicitado:** O fuso horário de um país é obtido por meio da API do TimeZoneDB, que retorna a zona de tempo com base no código do país.
+   - **Local**: Determinado pela API do IpInfo com base no IP do usuário.
+   - **Do país solicitado**: Obtido pela API do TimeZoneDB com base no código do país.
 
-2. **Obtenção de Informações do País:**
-   O código consulta a API `RestCountries` para obter o código do país, a capital e as coordenadas geográficas (latitude e longitude).
+2. **Informações do País**
 
-3. **Clima da Capital:**
-   A partir das coordenadas da capital, o clima é consultado na API Open-Meteo, que retorna a previsão do tempo para os próximos dias, com informações sobre as temperaturas máximas e mínimas.
+   - A API REST Countries fornece o código do país, a capital e as coordenadas geográficas.
 
-### Bibliotecas e Ferramentas Utilizadas
+3. **Clima**
 
-- **dotenv:** Para carregar as variáveis de ambiente com as chaves das APIs.
-- **fetch:** Para realizar as requisições HTTP e obter os dados das APIs.
-- **Intl.DateTimeFormat:** Para formatar as datas e exibir o horário corretamente de acordo com o fuso horário.
+   - A API Open-Meteo retorna a previsão para os próximos dias, com temperaturas máximas e mínimas.
+
+4. **Indicadores Econômicos**
+
+   - Os dados são obtidos por meio da API do World Bank Open Data.
+
+5. **Resumo**
+
+   - O conteúdo é extraído da Wikipédia em português.
+
+6. **Imagens**
+   - As imagens são obtidas pela API do Pexels.
+
+---
 
 ## Requisitos
 
-Este projeto depende de algumas variáveis de ambiente que devem ser configuradas em um arquivo `.env` na raiz do projeto. As chaves necessárias são:
+Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis de ambiente:
 
-- **TZ_API_KEY:** Chave da API TimeZoneDB.
-- **IP_API_KEY:** Chave da API IpInfo.
+```env
+TZ_API_KEY=your_timezonedb_api_key
+IP_API_KEY=your_ipinfo_api_key
+PEXELS_API_KEY=your_pexels_api_key
+```
 
-Para usar as APIs, você precisará de uma chave de acesso para cada uma das APIs mencionadas. Crie uma conta nas plataformas e insira as chaves correspondentes no arquivo `.env`.
+---
 
 ## Como Executar
 
@@ -52,10 +96,10 @@ Para usar as APIs, você precisará de uma chave de acesso para cada uma das API
    git clone https://github.com/Eduardoss45/atlas-api.git
    ```
 
-2. Navegue até o diretório do projeto:
+2. Acesse o diretório do projeto:
 
    ```bash
-   cd atlas-api-main
+   cd atlas-api
    ```
 
 3. Instale as dependências:
@@ -64,26 +108,112 @@ Para usar as APIs, você precisará de uma chave de acesso para cada uma das API
    npm install
    ```
 
-4. Crie um arquivo `.env` na raiz do projeto e adicione suas chaves de API:
+4. Crie o arquivo `.env` conforme instruído acima.
 
-   ```text
-   TZ_API_KEY=your_timezonedb_api_key
-   IP_API_KEY=your_ipinfo_api_key
-   ```
-
-5. Execute o projeto:
+5. Inicie o servidor de desenvolvimento:
 
    ```bash
    npm run dev
    ```
 
-## Futuro Projeto
+---
 
-Este código serve como base para um futuro projeto que ampliará essas funcionalidades. O objetivo será criar uma aplicação web que permita aos usuários consultar horários e clima de diferentes países de maneira mais interativa. Algumas melhorias e funcionalidades adicionais incluem:
+## Endpoint
 
-- **Interface Gráfica (Frontend):** Um frontend interativo para exibir as informações de forma mais amigável e visual, usando frameworks como React ou Vue.js.
-- **Busca por Países:** Os usuários poderão pesquisar por diferentes países para ver o horário local e a previsão do clima da capital.
+### `GET /info/:paisPt`
+
+Retorna as informações completas de um país a partir do **nome em português**.
+
+#### Parâmetro
+
+- `:paisPt` – Nome do país em português. Exemplos: `Brasil`, `Alemanha`, `Japão`
+
+#### Exemplo de requisição
+
+```http
+GET /info/Brasil
+```
+
+#### Exemplo de resposta
+
+```json
+{
+  "horarioLocal": "06/07/2025, 20:11:00",
+  "horarioPais": "06/07/2025, 20:11:00",
+  "timestamp": {
+    "local": "07/06/2025, 20:11",
+    "pais": "07/06/2025, 20:11"
+  },
+  "timezone": {
+    "local": "America/Sao_Paulo",
+    "pais": "America/Araguaina"
+  },
+  "capital": "Brasília",
+  "clima": [
+    {
+      "dia": "2025-06-07",
+      "min": 17.5,
+      "max": 26.6
+    }
+    // ... próximos dias
+  ],
+  "indicadores": {
+    "pib": {
+      "valor": 10294.866680778,
+      "ano": "2023"
+    },
+    "populacao": {
+      "valor": 211140729,
+      "ano": "2023"
+    },
+    "expectativaVida": {
+      "valor": 75.848,
+      "ano": "2023"
+    }
+  },
+  "resumo": "...",
+  "imagens": {
+    "original": "https://images.pexels.com/photos/3648269/pexels-photo-3648269.jpeg"
+    // ... demais tamanhos
+  }
+}
+```
+
+---
+
+## Estrutura do Projeto
+
+```bash
+.
+├── src/
+│   ├── controllers/
+│   │   └── infoController.js
+│   ├── services/
+│   │   ├── countryService.js
+│   │   ├── dataFetch.js
+│   │   ├── imageService.js
+│   │   ├── resumoService.js
+│   │   ├── timezoneService.js
+│   │   ├── weatherService.js
+│   │   └── worldbankService.js
+│   ├── utils/
+│   │   └── formatter.js
+│   ├── data/
+│   │   └── translate.json
+│   └── app.js
+├── .env
+├── package.json
+└── README.md
+```
+
+---
 
 ## Contribuindo
 
-Se você quiser contribuir para este projeto, fique à vontade para enviar pull requests ou abrir issues para sugerir melhorias ou relatar bugs.
+Contribuições são bem-vindas! Sinta-se à vontade para abrir uma _issue_ para reportar bugs, sugerir melhorias ou enviar um _pull request_ com novas funcionalidades.
+
+---
+
+## Licença
+
+Este projeto está licenciado sob a [MIT License](LICENSE).
